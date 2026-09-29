@@ -1,0 +1,122 @@
+#include <iostream>
+#include <limits>
+
+using namespace std;
+
+// Array to store board state (1 to 9)
+char board[9];
+
+// Function to reset the board to default numbers
+void resetBoard() {
+    for (int i = 0; i < 9; i++) {
+        board[i] = '1' + i;
+    }
+}
+
+// Function to display the dynamic board layout
+void displayBoard() {
+    cout << "\n";
+    cout << " " << board[0] << " | " << board[1] << " | " << board[2] << "\n";
+    cout << "---|---|---\n";
+    cout << " " << board[3] << " | " << board[4] << " | " << board[5] << "\n";
+    cout << "---|---|---\n";
+    cout << " " << board[6] << " | " << board[7] << " | " << board[8] << "\n";
+    cout << "\n";
+}
+
+// Function to check if a player has won
+bool checkWin() {
+    // Win conditions: Rows, Columns, Diagonals
+    int winPatterns[8][3] = {
+        {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
+        {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
+        {0, 4, 8}, {2, 4, 6}             // Diagonals
+    };
+
+    for (int i = 0; i < 8; i++) {
+        if (board[winPatterns[i][0]] == board[winPatterns[i][1]] &&
+            board[winPatterns[i][1]] == board[winPatterns[i][2]]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Function to check if the board is full (Draw)
+bool checkDraw() {
+    for (int i = 0; i < 9; i++) {
+        if (board[i] != 'X' && board[i] != 'O') {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Main Game Loop
+void playGame() {
+    resetBoard();
+    char currentPlayer = 'X';
+    bool gameRunning = true;
+
+    while (gameRunning) {
+        displayBoard();
+
+        int choice;
+        cout << "Player " << currentPlayer << ", enter a position (1-9): ";
+        cin >> choice;
+
+        // Input validation
+        if (cin.fail() || choice < 1 || choice > 9) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number between 1 and 9.\n";
+            continue;
+        }
+
+        int index = choice - 1;
+
+        // Check if spot is already taken
+        if (board[index] == 'X' || board[index] == 'O') {
+            cout << "That spot is already taken! Try again.\n";
+            continue;
+        }
+
+        // Apply move
+        board[index] = currentPlayer;
+
+        // Win and Draw Detection
+        if (checkWin()) {
+            displayBoard();
+            cout << "Congratulations! Player " << currentPlayer << " wins!\n";
+            gameRunning = false;
+        } else if (checkDraw()) {
+            displayBoard();
+            cout << "It's a draw!\n";
+            gameRunning = false;
+        } else {
+            // Switch player
+            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+        }
+    }
+}
+
+int main() {
+    char replay;
+
+    do {
+        cout << "===========================\n";
+        cout << "   TIC TAC TOE MINI GAME   \n";
+        cout << "===========================\n";
+
+        playGame();
+
+        // Replay option logic
+        cout << "Do you want to play again? (Y/N): ";
+        cin >> replay;
+        cout << endl;
+
+    } while (replay == 'y' || replay == 'Y');
+
+    cout << "Thanks for playing!\n";
+    return 0;
+}
